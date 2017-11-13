@@ -1,5 +1,7 @@
 var ethUtil = require('ethereumjs-util')
 var sigUtil = require('eth-sig-util')
+var $ = require("jquery");
+var endpoint = '/api';
 
 var provider
 window.addEventListener('load', function() {
@@ -12,7 +14,7 @@ window.addEventListener('load', function() {
   }
 })
 
-function signMessage(data) {
+function signMessage(data, cb) {
   var from = web3.eth.accounts[0]
 
   var params = [data, from]
@@ -25,12 +27,30 @@ function signMessage(data) {
   }, function (err, result) {
     if (err) return console.error(err)
     if (result.error) return console.error(result.error)
-    console.log('PERSONAL SIGNED:' + JSON.stringify(result.result))
+    cb(result.result)
   })
 
 }
 
+function postMessage(msg) {
+  console.log(JSON.stringify(msg))
+  var serializedJSON = JSON.stringify({ "data": msg});
+  $.ajax({
+    'type': 'POST',
+    'url': endpoint + '/commit',
+    'contentType': 'application/json',
+    'data': serializedJSON,
+    'dataType': 'json',
+    'success': function(data){
+      console.log(data);
+    },
+    'fail': function(data){
+      console.log(data);
+    }
+  });
+}
+
 personalSignButton.addEventListener('click', function(event) {
   event.preventDefault()
-  signMessage('0x544f444f')
+  signMessage('0x544f444f', postMessage)
 })

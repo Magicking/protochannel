@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify -t brfs js/index.js -o build_client/bundle.js"
+    "build": "browserify -t brfs js/index.js -o html/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -15,7 +15,8 @@
   "dependencies": {
     "build-bundle": "^2.0.8",
     "eth-sig-util": "^1.2.0",
-    "ethereumjs-util": "^5.1.1"
+    "ethereumjs-util": "^5.1.1",
+    "jquery": "^3.2.1"
   },
   "devDependencies": {
     "brfs": "^1.4.3"
