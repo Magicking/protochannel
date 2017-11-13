@@ -1,0 +1,84 @@
+swagger: '2.0'
+info:
+  title: Protochannel
+  description: |
+    Protochannel API
+  version: "0.1.0"
+produces:
+  - application/json
+consumes:
+  - application/json
+paths:
+  /commit:
+    post:
+      summary: Commit a ethereum signed message to a channel
+      operationId: commit_to_channel
+      description: Send and commit a valid signed ethereum message
+      responses:
+        200:
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      parameters:
+        - name: message
+          in: body
+          schema:
+            $ref: '#/definitions/Message'
+          required: true
+  /status:
+    get:
+      summary: Various information on the micro service
+      operationId: status
+      description: Return various information
+      responses:
+        200:
+          description: Information of the micro service
+          schema:
+            $ref: '#/definitions/Information'
+
+definitions:
+  Message:
+    type: object
+    description: |
+      Message to send to channel
+    required:
+      - data
+    properties:
+      data:
+        type: string
+        description: Hex encoded payload(TODO TDB) information
+  Information:
+    type: object
+    properties:
+      contract_address:
+        type: string
+        description: Channel address
+      channels:
+        type: array
+        description: List of in-memory channel
+        items:
+          $ref: '#/definitions/Channel'
+  Channel:
+    type: object
+    description: Channel information
+    properties:
+      channel:
+        type: string
+        description: Channel Identifier
+      nonce:
+        type: integer
+        description: Channel nonce
+  Error:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

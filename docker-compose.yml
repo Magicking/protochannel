@@ -1,0 +1,14 @@
+version: '2'
+services:
+  protochannel:
+    build: .
+
+  caddy-rev:
+    image: abiosoft/caddy
+    ports:
+      - "0.0.0.0:8000:80"
+    volumes:
+      - "./Caddyfile:/etc/Caddyfile:ro"
+      - "./html:/var/www:ro"
+    links:
+      - protochannel

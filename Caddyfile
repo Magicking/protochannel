@@ -1,0 +1,9 @@
+0.0.0.0:80 {
+  limits 10mb
+  proxy /api http://protochannel:8090 {
+    without /api
+  }
+  root /var/www
+  log stdout
+  errors stdout
+}

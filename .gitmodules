@@ -1,0 +1,66 @@
+[submodule "vendor/github.com/PuerkitoBio/purell"]
+	path = vendor/github.com/PuerkitoBio/purell
+	url = https://github.com/PuerkitoBio/purell
+[submodule "vendor/github.com/PuerkitoBio/urlesc"]
+	path = vendor/github.com/PuerkitoBio/urlesc
+	url = https://github.com/PuerkitoBio/urlesc
+[submodule "vendor/github.com/asaskevich/govalidator"]
+	path = vendor/github.com/asaskevich/govalidator
+	url = https://github.com/asaskevich/govalidator
+[submodule "vendor/github.com/docker/go-units"]
+	path = vendor/github.com/docker/go-units
+	url = https://github.com/docker/go-units
+[submodule "vendor/github.com/go-openapi/analysis"]
+	path = vendor/github.com/go-openapi/analysis
+	url = https://github.com/go-openapi/analysis
+[submodule "vendor/github.com/go-openapi/errors"]
+	path = vendor/github.com/go-openapi/errors
+	url = https://github.com/go-openapi/errors
+[submodule "vendor/github.com/go-openapi/jsonpointer"]
+	path = vendor/github.com/go-openapi/jsonpointer
+	url = https://github.com/go-openapi/jsonpointer
+[submodule "vendor/github.com/go-openapi/jsonreference"]
+	path = vendor/github.com/go-openapi/jsonreference
+	url = https://github.com/go-openapi/jsonreference
+[submodule "vendor/github.com/go-openapi/loads"]
+	path = vendor/github.com/go-openapi/loads
+	url = https://github.com/go-openapi/loads
+[submodule "vendor/github.com/go-openapi/runtime"]
+	path = vendor/github.com/go-openapi/runtime
+	url = https://github.com/go-openapi/runtime
+[submodule "vendor/github.com/go-openapi/spec"]
+	path = vendor/github.com/go-openapi/spec
+	url = https://github.com/go-openapi/spec
+[submodule "vendor/github.com/go-openapi/strfmt"]
+	path = vendor/github.com/go-openapi/strfmt
+	url = https://github.com/go-openapi/strfmt
+[submodule "vendor/github.com/go-openapi/swag"]
+	path = vendor/github.com/go-openapi/swag
+	url = https://github.com/go-openapi/swag
+[submodule "vendor/github.com/go-openapi/validate"]
+	path = vendor/github.com/go-openapi/validate
+	url = https://github.com/go-openapi/validate
+[submodule "vendor/github.com/jessevdk/go-flags"]
+	path = vendor/github.com/jessevdk/go-flags
+	url = https://github.com/jessevdk/go-flags
+[submodule "vendor/github.com/mailru/easyjson"]
+	path = vendor/github.com/mailru/easyjson
+	url = https://github.com/mailru/easyjson
+[submodule "vendor/github.com/mitchellh/mapstructure"]
+	path = vendor/github.com/mitchellh/mapstructure
+	url = https://github.com/mitchellh/mapstructure
+[submodule "vendor/github.com/tylerb/graceful"]
+	path = vendor/github.com/tylerb/graceful
+	url = https://github.com/tylerb/graceful
+[submodule "vendor/golang.org/x/net"]
+	path = vendor/golang.org/x/net
+	url = https://go.googlesource.com/net
+[submodule "vendor/golang.org/x/text"]
+	path = vendor/golang.org/x/text
+	url = https://go.googlesource.com/text
+[submodule "vendor/gopkg.in/mgo.v2"]
+	path = vendor/gopkg.in/mgo.v2
+	url = https://gopkg.in/mgo.v2
+[submodule "vendor/gopkg.in/yaml.v2"]
+	path = vendor/gopkg.in/yaml.v2
+	url = https://gopkg.in/yaml.v2
