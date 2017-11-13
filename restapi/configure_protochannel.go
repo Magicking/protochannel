@@ -6,10 +6,12 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
+	"time"
 
 	errors "github.com/go-openapi/errors"
 	runtime "github.com/go-openapi/runtime"
 	middleware "github.com/go-openapi/runtime/middleware"
+	swag "github.com/go-openapi/swag"
 	graceful "github.com/tylerb/graceful"
 
 	"github.com/Magicking/protochannel/internal"
@@ -20,8 +22,30 @@ import (
 
 //go:generate swagger generate server --target .. --name  --spec ../docs/protochannel.yml
 
+var ethopts struct {
+	WsURI        string `long:"ws-uri" env:"WS_URI" description:"Ethereum WS URI (e.g: ws://HOST:8546)"`
+	Retry        int    `long:"retry" env:"RETRY" description:"Max connection retry"`
+	ContractAddr string `long:"contract-address" env:"CONTRACT_ADDRESS" description:"Deployed contract address"`
+	PrivateKey   string `long:"pkey" env:"PRIVATE_KEY" description:"hex encoded private key"`
+}
+
+var serviceopts struct {
+	SchedulerTick int    `long:"sched-tick" env:"SCHED_TICK" default:"10" description:"Internal Scheduler ticker in second"`
+	DbDSN         string `long:"db-dsn" env:"DB_DSN" description:"Database DSN (e.g: /tmp/test.sqlite)"`
+}
+
 func configureFlags(api *operations.ProtochannelAPI) {
-	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
+	ethOpts := swag.CommandLineOptionsGroup{
+		LongDescription:  "",
+		ShortDescription: "Ethereum options",
+		Options:          &ethopts,
+	}
+	serviceOpts := swag.CommandLineOptionsGroup{
+		LongDescription:  "",
+		ShortDescription: "Service options",
+		Options:          &serviceopts,
+	}
+	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ethOpts, serviceOpts}
 }
 
 func configureAPI(api *operations.ProtochannelAPI) http.Handler {
@@ -30,16 +54,23 @@ func configureAPI(api *operations.ProtochannelAPI) http.Handler {
 
 	// Set your custom logger if needed. Default one is log.Printf
 	// Expected interface func(string, ...interface{})
-	//
+	//.Background()
 	// Example:
 	// api.Logger = log.Printf
+
+	ctx := internal.InitContext(context.Background())
+	internal.NewSchedulerToContext(ctx, time.Duration(serviceopts.SchedulerTick)*time.Second)
+	internal.NewDBToContext(ctx, serviceopts.DbDSN)
+	internal.NewCCToContext(ctx, ethopts.WsURI, ethopts.Retry)
+	internal.NewBLKToContext(ctx, ethopts.WsURI, ethopts.PrivateKey, ethopts.Retry)
+	//put contract @contract-addr into ctx
 
 	api.JSONConsumer = runtime.JSONConsumer()
 
 	api.JSONProducer = runtime.JSONProducer()
 
 	api.CommitToChannelHandler = operations.CommitToChannelHandlerFunc(func(params operations.CommitToChannelParams) middleware.Responder {
-		return internal.CommitToChannel(context.Background(), params)
+		return internal.CommitToChannel(ctx, params)
 	})
 	api.StatusHandler = operations.StatusHandlerFunc(func(params operations.StatusParams) middleware.Responder {
 		return middleware.NotImplemented("operation .Status has not yet been implemented")

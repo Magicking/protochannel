@@ -67,3 +67,15 @@
 [submodule "vendor/github.com/ethereum/go-ethereum"]
 	path = vendor/github.com/ethereum/go-ethereum
 	url = https://github.com/ethereum/go-ethereum
+[submodule "vendor/github.com/Magicking/gethitihteg"]
+	path = vendor/github.com/Magicking/gethitihteg
+	url = https://github.com/Magicking/gethitihteg
+[submodule "vendor/github.com/jinzhu/gorm"]
+	path = vendor/github.com/jinzhu/gorm
+	url = https://github.com/jinzhu/gorm
+[submodule "vendor/github.com/jinzhu/inflection"]
+	path = vendor/github.com/jinzhu/inflection
+	url = https://github.com/jinzhu/inflection
+[submodule "vendor/github.com/lib/pq"]
+	path = vendor/github.com/lib/pq
+	url = https://github.com/lib/pq
