@@ -1,0 +1,23 @@
+{
+  "name": "protochannel",
+  "version": "0.1.0",
+  "description": "Protochannel demo package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify -t brfs js/index.js -o build_client/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Magicking/protochannel.git"
+  },
+  "homepage": "https://github.com/Magicking/protochannel#readme",
+  "dependencies": {
+    "build-bundle": "^2.0.8",
+    "eth-sig-util": "^1.2.0",
+    "ethereumjs-util": "^5.1.1"
+  },
+  "devDependencies": {
+    "brfs": "^1.4.3"
+  }
+}
