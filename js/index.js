@@ -27,14 +27,14 @@ function signMessage(data, cb) {
   }, function (err, result) {
     if (err) return console.error(err)
     if (result.error) return console.error(result.error)
-    cb(result.result)
+    cb(data, result.result)
   })
 
 }
 
-function postMessage(msg) {
-  console.log(JSON.stringify(msg))
-  var serializedJSON = JSON.stringify({ "data": msg});
+function postMessage(data, signature) {
+  console.log(JSON.stringify(signature))
+  var serializedJSON = JSON.stringify({ "data": data, "signature": signature});
   $.ajax({
     'type': 'POST',
     'url': endpoint + '/commit',
