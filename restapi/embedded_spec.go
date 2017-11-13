@@ -123,11 +123,16 @@ func init() {
       "description": "Message to send to channel\n",
       "type": "object",
       "required": [
-        "data"
+        "data",
+        "signature"
       ],
       "properties": {
         "data": {
           "description": "Hex encoded payload(TODO TDB) information",
+          "type": "string"
+        },
+        "signature": {
+          "description": "Hex encoded signature",
           "type": "string"
         }
       }

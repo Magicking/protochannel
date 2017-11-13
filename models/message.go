@@ -22,15 +22,26 @@ type Message struct {
 	// Hex encoded payload(TODO TDB) information
 	// Required: true
 	Data *string `json:"data"`
+
+	// Hex encoded signature
+	// Required: true
+	Signature *string `json:"signature"`
 }
 
 /* polymorph Message data false */
+
+/* polymorph Message signature false */
 
 // Validate validates this message
 func (m *Message) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateData(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateSignature(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -44,6 +55,15 @@ func (m *Message) Validate(formats strfmt.Registry) error {
 func (m *Message) validateData(formats strfmt.Registry) error {
 
 	if err := validate.Required("data", "body", m.Data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Message) validateSignature(formats strfmt.Registry) error {
+
+	if err := validate.Required("signature", "body", m.Signature); err != nil {
 		return err
 	}
 

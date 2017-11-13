@@ -44,10 +44,14 @@ definitions:
       Message to send to channel
     required:
       - data
+      - signature
     properties:
       data:
         type: string
         description: Hex encoded payload(TODO TDB) information
+      signature:
+        type: string
+        description: Hex encoded signature
   Information:
     type: object
     properties:

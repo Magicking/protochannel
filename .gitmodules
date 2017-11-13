@@ -64,3 +64,6 @@
 [submodule "vendor/gopkg.in/yaml.v2"]
 	path = vendor/gopkg.in/yaml.v2
 	url = https://gopkg.in/yaml.v2
+[submodule "vendor/github.com/ethereum/go-ethereum"]
+	path = vendor/github.com/ethereum/go-ethereum
+	url = https://github.com/ethereum/go-ethereum

@@ -3,6 +3,7 @@
 package restapi
 
 import (
+	"context"
 	"crypto/tls"
 	"net/http"
 
@@ -11,6 +12,7 @@ import (
 	middleware "github.com/go-openapi/runtime/middleware"
 	graceful "github.com/tylerb/graceful"
 
+	"github.com/Magicking/protochannel/internal"
 	"github.com/Magicking/protochannel/restapi/operations"
 )
 
@@ -37,7 +39,7 @@ func configureAPI(api *operations.ProtochannelAPI) http.Handler {
 	api.JSONProducer = runtime.JSONProducer()
 
 	api.CommitToChannelHandler = operations.CommitToChannelHandlerFunc(func(params operations.CommitToChannelParams) middleware.Responder {
-		return middleware.NotImplemented("operation .CommitToChannel has not yet been implemented")
+		return internal.CommitToChannel(context.Background(), params)
 	})
 	api.StatusHandler = operations.StatusHandlerFunc(func(params operations.StatusParams) middleware.Responder {
 		return middleware.NotImplemented("operation .Status has not yet been implemented")
