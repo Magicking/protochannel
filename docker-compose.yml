@@ -3,10 +3,10 @@ services:
   protochannel:
     build: .
     environment:
-      - WS_URI=https://ropsten.infura.io
+      - WS_URI=ws://1.1.3.7:8546
       - DB_DSN=host=postgres user=f3b1be969686afb4520ce dbname=protochannel sslmode=disable password=839169c0ea5e59146a
       - PRIVATE_KEY=8e973e8e3d06a321d7285695560a45bd4946eb6f59410732b048c59a0174cc09 # 0xcd5bb3a1E6d7676DAD570566A455dC38b7e3EaDf
-      - CONTRACT_ADDRESS=0xcd5bb3a1E6d7676DAD570566A455dC38b7e3EaDf #todo deploy
+      - CONTRACT_ADDRESS=0x59b9310dff261526b9526b0987ced3c9fcbd40e1 #todo deploy
       - RETRY=3
     links:
       - postgres
