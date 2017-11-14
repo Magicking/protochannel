@@ -16,10 +16,7 @@ type Msg struct {
 }
 
 func InsertMsg(ctx context.Context, msg *Msg) error {
-	db, ok := DBFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("Could not obtain DB from Context")
-	}
+	db := DBFromContext(ctx)
 	if err := db.Create(msg).Error; err != nil {
 		return err
 	}
@@ -28,10 +25,7 @@ func InsertMsg(ctx context.Context, msg *Msg) error {
 }
 
 func DeleteMsg(ctx context.Context, addr string) error {
-	db, ok := DBFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("Could not obtain DB from Context")
-	}
+	db := DBFromContext(ctx)
 	cursor := db.Where(Msg{Addr: addr}).Delete(Msg{})
 	if cursor.Error != nil {
 		return fmt.Errorf("Error deleting for URL (%v): %v", addr, cursor.Error)

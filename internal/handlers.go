@@ -9,6 +9,7 @@ import (
 	op "github.com/Magicking/protochannel/restapi/operations"
 	middleware "github.com/go-openapi/runtime/middleware"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -25,7 +26,16 @@ func CommitToChannel(ctx context.Context, params op.CommitToChannelParams) middl
 		log.Printf(err_str)
 		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
 	}
-	log.Printf("Addr: %s", addr.String())
+	ctct := getContextValue(ctx, contractKey).(*WhitelistCaller)
+	//TODO set proper From & context
+	opts := &bind.CallOpts{From: addr, Context: context.TODO()}
+	ret, err := ctct.IsListed(opts, addr)
+	if err != nil {
+		err_str := fmt.Sprintf("Failed to call %s: %v", "IsListed", err)
+		log.Printf(err_str)
+		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
+	}
+	log.Printf("Addr: %s [%v]", addr.String(), ret)
 	return op.NewCommitToChannelOK()
 }
 
