@@ -88,22 +88,30 @@ func NewDBToContext(ctx context.Context, dbDsn string) {
 	setContextValue(ctx, dbKey, db)
 }
 
-func DBFromContext(ctx context.Context) (*gorm.DB, bool) {
-	db, ok := getContextValue(ctx, dbKey).(*gorm.DB)
-	return db, ok
+func DBFromContext(ctx context.Context) *gorm.DB {
+	key := dbKey
+	ret, ok := getContextValue(ctx, key).(*gorm.DB)
+	if !ok {
+		log.Fatalf("Could not cast context with key %d", key)
+	}
+	return ret
 }
 
 func NewCCToContext(ctx context.Context, wsURI string, retry int) {
-	cc, err := blktk.NewClientConnector(wsURI, retry)
+	cc, err := blktk.NewNodeConnector(wsURI, retry)
 	if err != nil {
 		log.Fatalf("Could not initialize client context: %v", err)
 	}
 	setContextValue(ctx, ethRpcKey, cc)
 }
 
-func CCFromContext(ctx context.Context) (*blktk.ClientConnector, bool) {
-	cc, ok := getContextValue(ctx, ethRpcKey).(*blktk.ClientConnector)
-	return cc, ok
+func CCFromContext(ctx context.Context) *blktk.NodeConnector {
+	key := ethRpcKey
+	ret, ok := getContextValue(ctx, key).(*blktk.NodeConnector)
+	if !ok {
+		log.Fatalf("Could not cast context with key %d", key)
+	}
+	return ret
 }
 
 func NewSchedulerToContext(ctx context.Context, tick time.Duration) {
@@ -111,20 +119,28 @@ func NewSchedulerToContext(ctx context.Context, tick time.Duration) {
 	setContextValue(ctx, schedulerKey, c)
 }
 
-func SchedulerChanFromContext(ctx context.Context) (chan callback, bool) {
-	c, ok := getContextValue(ctx, schedulerKey).(chan callback)
-	return c, ok
-}
-
-func NewBLKToContext(ctx context.Context, wsURI, privateKey string, entry int) {
-	blk, err := blktk.NewBlockchainContext(wsURI, privateKey, entry)
-	if err != nil {
-		log.Fatalf("Could not initialize blockchain context: %v", err)
+func SchedulerChanFromContext(ctx context.Context) chan callback {
+	key := schedulerKey
+	ret, ok := getContextValue(ctx, key).(chan callback)
+	if !ok {
+		log.Fatalf("Could not cast context with key %d", key)
 	}
-	setContextValue(ctx, blkKey, blk)
+	return ret
 }
 
-func BLKFromContext(ctx context.Context) (*blktk.BlockchainContext, bool) {
-	blk, ok := getContextValue(ctx, blkKey).(*blktk.BlockchainContext)
-	return blk, ok
-}
+//func NewBLKToContext(ctx context.Context, wsURI, privateKey string, entry int) {
+//	blk, err := blktk.NewBlockchainContext(wsURI, privateKey, entry)
+//	if err != nil {
+//		log.Fatalf("Could not initialize blockchain context: %v", err)
+//	}
+//	setContextValue(ctx, blkKey, blk)
+//}
+//
+//func BLKFromContext(ctx context.Context) *blktk.BlockchainContext {
+//	key := blkKey
+//	ret, ok := getContextValue(ctx, key).(*blktk.BlockchainContext)
+//	if !ok {
+//		log.Fatalf("Could not cast context with key %d", key)
+//	}
+//	return ret
+//}

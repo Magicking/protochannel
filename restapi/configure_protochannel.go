@@ -62,8 +62,8 @@ func configureAPI(api *operations.ProtochannelAPI) http.Handler {
 	internal.NewSchedulerToContext(ctx, time.Duration(serviceopts.SchedulerTick)*time.Second)
 	internal.NewDBToContext(ctx, serviceopts.DbDSN)
 	internal.NewCCToContext(ctx, ethopts.WsURI, ethopts.Retry)
-	internal.NewBLKToContext(ctx, ethopts.WsURI, ethopts.PrivateKey, ethopts.Retry)
-	//put contract @contract-addr into ctx
+	//internal.NewBLKToContext(ctx, ethopts.WsURI, ethopts.Retry)
+	internal.Init(ctx, ethopts.ContractAddr, ethopts.PrivateKey)
 
 	api.JSONConsumer = runtime.JSONConsumer()
 
