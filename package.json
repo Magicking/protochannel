@@ -13,10 +13,15 @@
   },
   "homepage": "https://github.com/Magicking/protochannel#readme",
   "dependencies": {
+    "angular": "^1.6.6",
+    "bn": "^1.0.1",
+    "bootstrap": "^4.0.0-beta.2",
     "build-bundle": "^2.0.8",
     "eth-sig-util": "^1.2.0",
     "ethereumjs-util": "^5.1.1",
-    "jquery": "^3.2.1"
+    "ethjs": "^0.3.0",
+    "jquery": "^3.2.1",
+    "popper.js": "^1.12.3"
   },
   "devDependencies": {
     "brfs": "^1.4.3"
