@@ -51,7 +51,8 @@ See: [Go Swagger][2]
 
 **How to generate API Smart Contract ABI ?**
 ```
-abigen --sol contract/whitelist.sol --pkg internal --out internal/whitelist.go
+#abigen --sol contract/whitelist.sol --pkg internal --out internal/whitelist.go
+abigen -sol contracts/tictactoe.sol --pkg internal -out internal/tictactoe.go
 ```
 See: [Abigen][3]
 
