@@ -23,14 +23,14 @@ type Message struct {
 	// Required: true
 	Data *string `json:"data"`
 
-	// Hex encoded signature
+	// Ordered list of hex encoded signature
 	// Required: true
-	Signature *string `json:"signature"`
+	Signatures []string `json:"signatures"`
 }
 
 /* polymorph Message data false */
 
-/* polymorph Message signature false */
+/* polymorph Message signatures false */
 
 // Validate validates this message
 func (m *Message) Validate(formats strfmt.Registry) error {
@@ -41,7 +41,7 @@ func (m *Message) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateSignature(formats); err != nil {
+	if err := m.validateSignatures(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -61,9 +61,9 @@ func (m *Message) validateData(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Message) validateSignature(formats strfmt.Registry) error {
+func (m *Message) validateSignatures(formats strfmt.Registry) error {
 
-	if err := validate.Required("signature", "body", m.Signature); err != nil {
+	if err := validate.Required("signatures", "body", m.Signatures); err != nil {
 		return err
 	}
 

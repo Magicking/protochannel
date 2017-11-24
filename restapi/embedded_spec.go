@@ -43,6 +43,37 @@ func init() {
           }
         ],
         "responses": {
+          "200": {
+            "description": "Internal new state",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/publish": {
+      "post": {
+        "description": "Sign-off and commit a valid signed ethereum message",
+        "summary": "Sign-off a partially ethereum signed message to a channel",
+        "operationId": "sign_off_commit",
+        "parameters": [
+          {
+            "name": "message",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        ],
+        "responses": {
           "200": {},
           "default": {
             "description": "Unexpected error",
@@ -64,6 +95,12 @@ func init() {
             "schema": {
               "$ref": "#/definitions/Information"
             }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           }
         }
       }
@@ -76,11 +113,18 @@ func init() {
       "properties": {
         "channel": {
           "description": "Channel Identifier",
-          "type": "string"
-        },
-        "nonce": {
-          "description": "Channel nonce",
           "type": "integer"
+        },
+        "signatures": {
+          "description": "Ordered list of hex encoded signature",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "state": {
+          "description": "Channel state",
+          "type": "string"
         }
       }
     },
@@ -106,6 +150,10 @@ func init() {
     "Information": {
       "type": "object",
       "properties": {
+        "abi": {
+          "description": "Contract ABI JSON encoded",
+          "type": "string"
+        },
         "channels": {
           "description": "List of in-memory channel",
           "type": "array",
@@ -124,16 +172,19 @@ func init() {
       "type": "object",
       "required": [
         "data",
-        "signature"
+        "signatures"
       ],
       "properties": {
         "data": {
           "description": "Hex encoded payload(TODO TDB) information",
           "type": "string"
         },
-        "signature": {
-          "description": "Hex encoded signature",
-          "type": "string"
+        "signatures": {
+          "description": "Ordered list of hex encoded signature",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

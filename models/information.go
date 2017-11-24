@@ -19,12 +19,17 @@ import (
 
 type Information struct {
 
+	// Contract ABI JSON encoded
+	Abi string `json:"abi,omitempty"`
+
 	// List of in-memory channel
 	Channels []*Channel `json:"channels"`
 
 	// Channel address
 	ContractAddress string `json:"contract_address,omitempty"`
 }
+
+/* polymorph Information abi false */
 
 /* polymorph Information channels false */
 

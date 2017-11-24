@@ -18,23 +18,42 @@ import (
 type Channel struct {
 
 	// Channel Identifier
-	Channel string `json:"channel,omitempty"`
+	Channel int64 `json:"channel,omitempty"`
 
-	// Channel nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	// Ordered list of hex encoded signature
+	Signatures []string `json:"signatures"`
+
+	// Channel state
+	State string `json:"state,omitempty"`
 }
 
 /* polymorph Channel channel false */
 
-/* polymorph Channel nonce false */
+/* polymorph Channel signatures false */
+
+/* polymorph Channel state false */
 
 // Validate validates this channel
 func (m *Channel) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateSignatures(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Channel) validateSignatures(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Signatures) { // not required
+		return nil
+	}
+
 	return nil
 }
 

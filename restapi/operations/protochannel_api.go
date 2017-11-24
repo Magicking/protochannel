@@ -38,6 +38,9 @@ func NewProtochannelAPI(spec *loads.Document) *ProtochannelAPI {
 		CommitToChannelHandler: CommitToChannelHandlerFunc(func(params CommitToChannelParams) middleware.Responder {
 			return middleware.NotImplemented("operation CommitToChannel has not yet been implemented")
 		}),
+		SignOffCommitHandler: SignOffCommitHandlerFunc(func(params SignOffCommitParams) middleware.Responder {
+			return middleware.NotImplemented("operation SignOffCommit has not yet been implemented")
+		}),
 		StatusHandler: StatusHandlerFunc(func(params StatusParams) middleware.Responder {
 			return middleware.NotImplemented("operation Status has not yet been implemented")
 		}),
@@ -73,6 +76,8 @@ type ProtochannelAPI struct {
 
 	// CommitToChannelHandler sets the operation handler for the commit to channel operation
 	CommitToChannelHandler CommitToChannelHandler
+	// SignOffCommitHandler sets the operation handler for the sign off commit operation
+	SignOffCommitHandler SignOffCommitHandler
 	// StatusHandler sets the operation handler for the status operation
 	StatusHandler StatusHandler
 
@@ -140,6 +145,10 @@ func (o *ProtochannelAPI) Validate() error {
 
 	if o.CommitToChannelHandler == nil {
 		unregistered = append(unregistered, "CommitToChannelHandler")
+	}
+
+	if o.SignOffCommitHandler == nil {
+		unregistered = append(unregistered, "SignOffCommitHandler")
 	}
 
 	if o.StatusHandler == nil {
@@ -240,6 +249,11 @@ func (o *ProtochannelAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/commit"] = NewCommitToChannel(o.context, o.CommitToChannelHandler)
+
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/publish"] = NewSignOffCommit(o.context, o.SignOffCommitHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)

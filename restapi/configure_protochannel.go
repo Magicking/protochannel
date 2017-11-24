@@ -73,7 +73,10 @@ func configureAPI(api *operations.ProtochannelAPI) http.Handler {
 		return internal.CommitToChannel(ctx, params)
 	})
 	api.StatusHandler = operations.StatusHandlerFunc(func(params operations.StatusParams) middleware.Responder {
-		return middleware.NotImplemented("operation .Status has not yet been implemented")
+		return internal.Status(ctx, params)
+	})
+	api.SignOffCommitHandler = operations.SignOffCommitHandlerFunc(func(params operations.SignOffCommitParams) middleware.Responder {
+		return internal.SignOffCommit(ctx, params)
 	})
 
 	api.ServerShutdown = func() {}

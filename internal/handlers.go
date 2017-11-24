@@ -11,69 +11,122 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 )
+
+func getState(ctx context.Context) (string, []string, error) {
+	st, err := LastState(ctx)
+	if err != nil {
+		return "", nil, err
+	}
+	if st == nil {
+		err = CreateAndSign(ctx)
+		if err != nil {
+			return "", nil, err
+		}
+		st, err = LastState(ctx)
+		if err != nil {
+			return "", nil, err
+		}
+		if st == nil {
+			log.Fatalf("Could not create state")
+		}
+	}
+	return st.State, []string(st.Signatures), nil
+}
+
+func Status(ctx context.Context, params op.StatusParams) middleware.Responder {
+	channel_index := 0
+	st, sigs, err := getState(ctx)
+	if err != nil {
+		err_str := fmt.Sprintf("Could not get state: %v", err)
+		log.Printf(err_str)
+		return op.NewStatusDefault(500).WithPayload(&models.Error{Message: &err_str})
+	}
+	chn0 := &models.Channel{
+		Channel:    int64(channel_index),
+		State:      st,
+		Signatures: sigs,
+	}
+
+	return op.NewStatusOK().WithPayload(&models.Information{
+		Abi:             TicTacToeABI,
+		Channels:        []*models.Channel{chn0},
+		ContractAddress: contractAddr.String(),
+	})
+}
+
+func SignOffCommit(ctx context.Context, params op.SignOffCommitParams) middleware.Responder {
+	msg := params.Message
+	log.Printf("%s", *msg.Data)
+	log.Printf("%s", msg.Signatures)
+	data := common.FromHex(*msg.Data)
+	if len(msg.Signatures) != 2 { // TODO remove in favor of smart contract check
+		err_str := fmt.Sprintf("Signatures missing")
+		log.Printf(err_str)
+		return op.NewSignOffCommitDefault(500).WithPayload(&models.Error{Message: &err_str})
+	}
+	for i := range msg.Signatures {
+		sig := common.FromHex(msg.Signatures[i])
+		addr, err := ecRecover(ctx, data, sig)
+		if err != nil {
+			err_str := fmt.Sprintf("Failed to call %s: %v", "ecRecover", err)
+			log.Printf(err_str)
+			return op.NewSignOffCommitDefault(500).WithPayload(&models.Error{Message: &err_str})
+		}
+		ctct := getContextValue(ctx, contractKey).(*TicTacToe)
+		//TODO Timeout ?
+		opts := &bind.CallOpts{From: addr, Context: context.TODO()}
+		ret, err := ctct.GetPlayerMark(opts, addr)
+		log.Printf("Addr: %s [%v]", addr.String(), ret)
+	}
+	return op.NewSignOffCommitOK()
+}
 
 func CommitToChannel(ctx context.Context, params op.CommitToChannelParams) middleware.Responder {
 	msg := params.Message
-	log.Printf("%s", *msg.Data)
-	log.Printf("%s", *msg.Signature)
-	data := common.FromHex(*msg.Data)
-	sig := common.FromHex(*msg.Signature)
-	addr, err := ecRecover(ctx, data, sig)
-	if err != nil {
-		err_str := fmt.Sprintf("Failed to call %s: %v", "MakeTemplate", err)
+	state := common.FromHex(*msg.Data)
+	if len(msg.Signatures) == 0 {
+		err_str := fmt.Sprintf("Signature missing")
 		log.Printf(err_str)
 		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
 	}
-	ctct := getContextValue(ctx, contractKey).(*WhitelistCaller)
-	//TODO set proper From & context
+	sig := common.FromHex(msg.Signatures[0])
+	addr, err := ecRecover(ctx, state, sig)
+	if err != nil {
+		err_str := fmt.Sprintf("Failed to call %s: %v", "ecRecover", err)
+		log.Printf(err_str)
+		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
+	}
+	//TODO Check operation counter here
+	//TODO Check equivalence of old_state against new_state
+	ctct := getContextValue(ctx, contractKey).(*TicTacToe)
+	//TODO set context
+	var r, s [32]byte
+	v := uint8(sig[64])
+	copy(r[:], sig[0:32])
+	copy(s[:], sig[32:64])
+	log.Println(state)
 	opts := &bind.CallOpts{From: addr, Context: context.TODO()}
-	ret, err := ctct.IsListed(opts, addr)
+	canApply, err := ctct.Verify(opts, state, v, r, s)
 	if err != nil {
-		err_str := fmt.Sprintf("Failed to call %s: %v", "IsListed", err)
+		err_str := fmt.Sprintf("Failed to call %s: %v", "GetSignerGeth", err)
 		log.Printf(err_str)
 		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
 	}
-	log.Printf("Addr: %s [%v]", addr.String(), ret)
-	return op.NewCommitToChannelOK()
-}
-
-// EcRecover returns the address for the account that was used to create the signature.
-// Note, this function is compatible with eth_sign and personal_sign. As such it recovers
-// the address of:
-// hash = keccak256("\x19Ethereum Signed Message:\n"${message length}${message})
-// addr = ecrecover(hash, signature)
-//
-// Note, the signature must conform to the secp256k1 curve R, S and V values, where
-// the V value must be be 27 or 28 for legacy reasons.
-//
-// https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_ecRecover
-// signHash is a helper function that calculates a hash for the given message that can be
-// safely used to calculate a signature from.
-//
-// The hash is calulcated as
-//   keccak256("\x19Ethereum Signed Message:\n"${message length}${message}).
-//
-// This gives context to the signed message and prevents signing of transactions.
-func signHash(data []byte) []byte {
-	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
-	return crypto.Keccak256([]byte(msg))
-}
-func ecRecover(ctx context.Context, data, sig []byte) (common.Address, error) {
-	if len(sig) != 65 {
-		return common.Address{}, fmt.Errorf("signature must be 65 bytes long")
-	}
-	if sig[64] != 27 && sig[64] != 28 {
-		return common.Address{}, fmt.Errorf("invalid Ethereum signature (V is not 27 or 28)")
-	}
-	sig[64] -= 27 // Transform yellow paper V from 27/28 to 0/1
-
-	rpk, err := crypto.Ecrecover(signHash(data), sig)
+	log.Printf("canApply: %v", canApply)
+	ret, err := ctct.CheckAndApply(opts, state, v, r, s)
 	if err != nil {
-		return common.Address{}, err
+		err_str := fmt.Sprintf("Failed to call %s: %v", "CheckAndApply", err)
+		log.Printf(err_str)
+		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
 	}
-	pubKey := crypto.ToECDSAPub(rpk)
-	recoveredAddr := crypto.PubkeyToAddress(*pubKey)
-	return recoveredAddr, nil
+	log.Printf("Addr: %s %v", addr.String(), ret)
+	err = InsertState(ctx, &State{State: common.ToHex(state)}, msg.Signatures)
+	if err != nil {
+		err_str := fmt.Sprintf("Failed to call %s: %v", "InsertState", err)
+		log.Printf(err_str)
+		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
+	}
+	state_hex := common.ToHex(ret)
+	return op.NewCommitToChannelOK().WithPayload(&models.Message{Data: &state_hex})
 }

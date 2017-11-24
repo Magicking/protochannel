@@ -55,3 +55,61 @@ func (o *StatusOK) WriteResponse(rw http.ResponseWriter, producer runtime.Produc
 		}
 	}
 }
+
+/*StatusDefault Unexpected error
+
+swagger:response statusDefault
+*/
+type StatusDefault struct {
+	_statusCode int
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewStatusDefault creates StatusDefault with default headers values
+func NewStatusDefault(code int) *StatusDefault {
+	if code <= 0 {
+		code = 500
+	}
+
+	return &StatusDefault{
+		_statusCode: code,
+	}
+}
+
+// WithStatusCode adds the status to the status default response
+func (o *StatusDefault) WithStatusCode(code int) *StatusDefault {
+	o._statusCode = code
+	return o
+}
+
+// SetStatusCode sets the status to the status default response
+func (o *StatusDefault) SetStatusCode(code int) {
+	o._statusCode = code
+}
+
+// WithPayload adds the payload to the status default response
+func (o *StatusDefault) WithPayload(payload *models.Error) *StatusDefault {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the status default response
+func (o *StatusDefault) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *StatusDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(o._statusCode)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}

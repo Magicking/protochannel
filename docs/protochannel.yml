@@ -16,6 +16,26 @@ paths:
       description: Send and commit a valid signed ethereum message
       responses:
         200:
+          description: Internal new state
+          schema:
+            $ref: '#/definitions/Message'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      parameters:
+        - name: message
+          in: body
+          schema:
+            $ref: '#/definitions/Message'
+          required: true
+  /publish:
+    post:
+      summary: Sign-off a partially ethereum signed message to a channel
+      operationId: sign_off_commit
+      description: Sign-off and commit a valid signed ethereum message
+      responses:
+        200:
         default:
           description: Unexpected error
           schema:
@@ -36,6 +56,10 @@ paths:
           description: Information of the micro service
           schema:
             $ref: '#/definitions/Information'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
 definitions:
   Message:
@@ -44,17 +68,22 @@ definitions:
       Message to send to channel
     required:
       - data
-      - signature
+      - signatures
     properties:
       data:
         type: string
         description: Hex encoded payload(TODO TDB) information
-      signature:
-        type: string
-        description: Hex encoded signature
+      signatures:
+        type: array
+        description: Ordered list of hex encoded signature
+        items:
+          type: string
   Information:
     type: object
     properties:
+      abi:
+        type: string
+        description: Contract ABI JSON encoded
       contract_address:
         type: string
         description: Channel address
@@ -68,11 +97,16 @@ definitions:
     description: Channel information
     properties:
       channel:
-        type: string
-        description: Channel Identifier
-      nonce:
         type: integer
-        description: Channel nonce
+        description: Channel Identifier
+      state:
+        type: string
+        description: Channel state
+      signatures:
+        type: array
+        description: Ordered list of hex encoded signature
+        items:
+          type: string
   Error:
     type: object
     required:

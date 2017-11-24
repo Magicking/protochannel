@@ -16,11 +16,16 @@ import (
 // CommitToChannelOKCode is the HTTP code returned for type CommitToChannelOK
 const CommitToChannelOKCode int = 200
 
-/*CommitToChannelOK commit to channel o k
+/*CommitToChannelOK Internal new state
 
 swagger:response commitToChannelOK
 */
 type CommitToChannelOK struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Message `json:"body,omitempty"`
 }
 
 // NewCommitToChannelOK creates CommitToChannelOK with default headers values
@@ -28,10 +33,27 @@ func NewCommitToChannelOK() *CommitToChannelOK {
 	return &CommitToChannelOK{}
 }
 
+// WithPayload adds the payload to the commit to channel o k response
+func (o *CommitToChannelOK) WithPayload(payload *models.Message) *CommitToChannelOK {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the commit to channel o k response
+func (o *CommitToChannelOK) SetPayload(payload *models.Message) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *CommitToChannelOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
 /*CommitToChannelDefault Unexpected error
