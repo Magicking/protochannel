@@ -71,6 +71,7 @@ contract TicTacToe /* is Protochannel */ {
         FinalizeTimeout = 0;
         FinalizeNonce = 0x0;
         FinalizeTo = 0;
+        NewGame(P1, P2);
     }
 
     function SetPlayer(address other) public payable {
