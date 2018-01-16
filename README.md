@@ -1,6 +1,36 @@
 # Protochannel repository
 
-**How to run the prototype ?**
+## How it works
+
+Player interacts through the Golang API services by pushing signed
+message (personalSign) with MetaMask.
+They exchange signed message with state composed
+of memory, nonce, counter, state function transition.
+
+State:
+
+| Offset    | Byte length  | Description |
+|:----------:|:----------:|-------------|
+| `0` | 1 | Opcode for the state transition function: *NOP*(0), *PUT(x,y)*(1) |
+| `1` | 1 | Operation counter: nonce |
+| `2` | 1 | Parameter 1|
+| `3` | 1 | Parameter 2|
+| `4` | 9 | Tic Tac Toe Board game memory |
+
+State transition is enforced by games rules in Solidity Smart Contract
+
+TODO:
+
+ * Specifications
+ * Messaging
+ * Settlement
+ * Smart contract
+ * Documentation
+ * docs/protochannel.yml
+ * Tests
+ * Use libp2p
+
+## How to run the prototype ?
 
 1. Install Docker and Docker Compose (Window 10, macOS, Linux)
 2. Install git
@@ -18,30 +48,26 @@ Tested with:
 8. Access interface at:
   - http://127.0.0.1:8000
 
-Clicking on the button will trigger in this order:
-  - Sign the message "TOTO" with your ethereum key
-  - Post the message with the signature to the API server
-  - The API server recover the address
-  - Check IsListed with the smart contract by calling a RPC to the connected node
-
 The API server log shows when event are fired by the smart contract
 The browser console log contains various debug informations
 
-**Environment variables*
-*WS_URI* is the url of a capable WebSocket RPC node
+## Environment variables
+*WS_URI* is the url of a capable WebSocket RPC node, if private blockchain, the node networkid must match genesis chainid for Metamask to work correctly
   - WS_URI=ws://1.1.3.7:8546
 
 *DB_DSN* is the DSN of a PostgreSQL database (embedded with docker-compose)
   - DB_DSN=host=postgres user=f3b1be969686afb4520ce dbname=protochannel sslmode=disable password=839169c0ea5e59146a
 
-*PRIVATE_KEY* is a private key in hex format, used if needed to emit transaction to smart contract
+*PRIVATE_KEY* is a private key in hex format, used if needed to emit transaction to or deploy smart contract
   - PRIVATE_KEY=8e973e8e3d06a321d7285695560a45bd4946eb6f59410732b048c59a0174cc09 # 0xcd5bb3a1E6d7676DAD570566A455dC38b7e3EaDf
 
-*CONTRACT_ADDRESS* is the contract address of the deployed contract that the service should interract with
-  - CONTRACT_ADDRESS=0x59b9310dff261526b9526b0987ced3c9fcbd40e1 #todo deploy
+*CONTRACT_ADDRESS* is the contract address of the deployed contract that the service should interact with, empty will trigger a new deployment
+  - CONTRACT_ADDRESS=
 
 *RETRY* is the number of retry the service will perfom before giving up
   - RETRY=3
+
+## FAQ
 
 **How to generate API server ?**
 ```
@@ -51,7 +77,7 @@ See: [Go Swagger][2]
 
 **How to generate API Smart Contract ABI ?**
 ```
-#abigen --sol contract/whitelist.sol --pkg internal --out internal/whitelist.go
+
 abigen -sol contracts/tictactoe.sol --pkg internal -out internal/tictactoe.go
 ```
 See: [Abigen][3]
