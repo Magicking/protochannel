@@ -103,27 +103,19 @@ func CommitToChannel(ctx context.Context, params op.CommitToChannelParams) middl
 	//TODO Check operation counter here
 	//TODO Check equivalence of old_state against new_state
 	ctct := getContextValue(ctx, contractKey).(*TicTacToe)
-	//TODO set context
 	var r, s [32]byte
 	v := uint8(sig[64])
 	copy(r[:], sig[0:32])
 	copy(s[:], sig[32:64])
+	//TODO set context
 	opts := &bind.CallOpts{From: addr, Context: context.TODO()}
-	canApply, err := ctct.Verify(opts, state, v, r, s)
 	log.Printf("addr=%s, state=%+v, v=%+v, r=%+v, s=%+v\n", addr.String(), state, v, r, s)
-	if err != nil {
-		err_str := fmt.Sprintf("Failed to call %s: %v", "Verify", err)
-		log.Printf(err_str)
-		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
-	}
-	log.Printf("canApply: %v", canApply)
 	ret, err := ctct.CheckAndApply(opts, state, v, r, s)
 	if err != nil {
 		err_str := fmt.Sprintf("Failed to call %s: %v", "CheckAndApply", err)
 		log.Printf(err_str)
 		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
 	}
-	log.Printf("Addr: %s %v", addr.String(), ret)
 	err = InsertState(ctx, &State{State: common.ToHex(state)}, msg.Signatures)
 	if err != nil {
 		err_str := fmt.Sprintf("Failed to call %s: %v", "InsertState", err)

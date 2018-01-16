@@ -217,22 +217,10 @@ challenge.addEventListener('click', function(event) {
   event.preventDefault()
   var chanID = 0
   var sig = extractSignatureHex(channels[chanID].signatures[0])
-  console.log(channels[chanID].state)
-  console.log(sig)
-  contract.InfoSigner(channels[chanID].state, sig.v, sig.r, sig.s).then(function(ret) {console.log(ret)})
-  contract.ChallengeDebug(channels[chanID].state, ['0x0', '0x0', '0x0'], [sig.v], [sig.r], [sig.s]).then(function(ret) {console.log(ret)})
+  // Todo NOP or special opcode ?
   contract.Challenge(channels[chanID].state, ['0x0', '0x0', '0x0'], [sig.v], [sig.r], [sig.s]).then(function(tx) {
     console.log('TxHash:' + tx)
   })
-  /*
-  signMessage(channels[chanID].state, function(state, signature){
-      channels[chanID].signatures.push(signature)
-      publishMessage(state, channels[chanID].signatures)
-      console.log('challenge')
-      console.log(state)
-      console.log(channels)
-  })
-  */
 })
 
 setPlayer.addEventListener('click', function(event) {

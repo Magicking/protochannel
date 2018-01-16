@@ -240,23 +240,6 @@ contract TicTacToe /* is Protochannel */ {
         return state;
     }
 
-    function ChallengeDebug(bytes state, byte[3] newOperation, uint8[] v, bytes32[] r, bytes32[] s) public view returns (uint) {
-      address sig1 = getSigner(state, v[0], r[0], s[0]);
-      address sig2 = msg.sender;
-      if (!((P1 == sig1 && P2 == sig2) || (P1 == sig2 && P2 == sig1)))
-          return 1;
-      if (!(FinalizeNonce < state[1]))return 2; // Nonce can only go forward
-
-      address winner;
-      bool ok;
-      bytes memory lastState = setNewOperation(state, newOperation); // Encode new operation on state
-      lastState = Apply(lastState, P2); // Apply new operation on state
-      // TODO check
-      (winner, ok) = getWinner(lastState); // Determine winner
-      if (!(ok))return 3;
-      return 4;
-    }
-
     function Challenge(bytes state, byte[3] newOperation, uint8[] v, bytes32[] r, bytes32[] s) isPlayer public {
       address sig1 = getSigner(state, v[0], r[0], s[0]);
       address sig2 = msg.sender;
