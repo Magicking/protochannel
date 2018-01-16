@@ -36,6 +36,9 @@ paths:
       description: Sign-off and commit a valid signed ethereum message
       responses:
         200:
+          description: Internal new state
+          schema:
+            $ref: '#/definitions/Message'
         default:
           description: Unexpected error
           schema:

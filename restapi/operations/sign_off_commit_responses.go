@@ -16,11 +16,16 @@ import (
 // SignOffCommitOKCode is the HTTP code returned for type SignOffCommitOK
 const SignOffCommitOKCode int = 200
 
-/*SignOffCommitOK sign off commit o k
+/*SignOffCommitOK Internal new state
 
 swagger:response signOffCommitOK
 */
 type SignOffCommitOK struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Message `json:"body,omitempty"`
 }
 
 // NewSignOffCommitOK creates SignOffCommitOK with default headers values
@@ -28,10 +33,27 @@ func NewSignOffCommitOK() *SignOffCommitOK {
 	return &SignOffCommitOK{}
 }
 
+// WithPayload adds the payload to the sign off commit o k response
+func (o *SignOffCommitOK) WithPayload(payload *models.Message) *SignOffCommitOK {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the sign off commit o k response
+func (o *SignOffCommitOK) SetPayload(payload *models.Message) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *SignOffCommitOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
 /*SignOffCommitDefault Unexpected error

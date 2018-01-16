@@ -74,7 +74,12 @@ func init() {
           }
         ],
         "responses": {
-          "200": {},
+          "200": {
+            "description": "Internal new state",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
           "default": {
             "description": "Unexpected error",
             "schema": {

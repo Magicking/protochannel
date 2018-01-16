@@ -60,13 +60,17 @@ function bytesToHex(bytes) {
     return hex.join("");
 }
 
-function checkAndApply(chanID) {
-  var state = channels[chanID].state
-  var sig = channels[chanID].signatures[0]
+function extractSignatureHex(sig) {
   var r = sig.substring(2, 66)
   var s = sig.substring(66, 130)
   var v = new BN(sig.substring(130, 132), 16)
-  contract.CheckAndApply(state, v, '0x' + r, '0x' + s).then(function(d){
+  return {v: v, r: '0x' + r, s: '0x' + s}
+}
+
+function checkAndApply(chanID) {
+  var state = channels[chanID].state
+  var sig = extractSignatureHex(channels[chanID].signatures[0])
+  contract.CheckAndApply(state, sig.v, sig.r, sig.s).then(function(d){
       local_state = d['0']
       var scope = angular.element($("#board")).scope();
       scope.$apply(function(){
@@ -91,7 +95,7 @@ function state2grid(state) {
 
 function commitState(new_state) {
   signMessage(new_state, function(state, signature){
-      postMessage(state, signature)
+      postMessage(state, [signature])
       local_state = state
       fWaitNextState = true
       console.log(new_state, state)
@@ -140,17 +144,42 @@ function ecRecoMsg(data, sig, cb) {
   })
 }
 
-function postMessage(data, signature) {
-  var serializedJSON = JSON.stringify({ "data": data, "signatures": [signature]})
+function publishMessage(data, signature) {
+  var serializedJSON = JSON.stringify({ "data": data, "signatures": signature})
   $.ajax({
     'type': 'POST',
-    'url': endpoint + '/commit',
+    'url': endpoint + '/publish',
     'contentType': 'application/json',
     'data': serializedJSON,
     'dataType': 'json',
     'fail': function(data){
       console.log('fail:'+data)
     }
+  })
+  .fail(function(data, data2) {
+      console.log(data)
+      console.log(data2)
+      console.log('fail:'+data)
+  })
+  .done(function(data){
+      console.log('success:'+data)
+      console.log(channels[0].state)
+      console.log(data)
+  })
+  .always(function() {
+      console.log('always:')
+  });
+}
+
+function postMessage(data, signature) {
+  var serializedJSON = JSON.stringify({ "data": data, "signatures": signature})
+  console.log(serializedJSON)
+  $.ajax({
+    'type': 'POST',
+    'url': endpoint + '/commit',
+    'contentType': 'application/json',
+    'data': serializedJSON,
+    'dataType': 'json'
   })
   .fail(function(data, data2) {
       console.log(data)
@@ -172,6 +201,40 @@ function postMessage(data, signature) {
       console.log('always:')
   });
 }
+
+publish.addEventListener('click', function(event) {
+  event.preventDefault()
+  var chanID = 0
+  signMessage(channels[chanID].state, function(state, signature){
+      channels[chanID].signatures.push(signature)
+      publishMessage(state, channels[chanID].signatures)
+      console.log('publish')
+      console.log(state)
+      console.log(channels)
+  })
+})
+
+challenge.addEventListener('click', function(event) {
+  event.preventDefault()
+  var chanID = 0
+  var sig = extractSignatureHex(channels[chanID].signatures[0])
+  console.log(channels[chanID].state)
+  console.log(sig)
+  contract.InfoSigner(channels[chanID].state, sig.v, sig.r, sig.s).then(function(ret) {console.log(ret)})
+  contract.ChallengeDebug(channels[chanID].state, ['0x0', '0x0', '0x0'], [sig.v], [sig.r], [sig.s]).then(function(ret) {console.log(ret)})
+  contract.Challenge(channels[chanID].state, ['0x0', '0x0', '0x0'], [sig.v], [sig.r], [sig.s]).then(function(tx) {
+    console.log('TxHash:' + tx)
+  })
+  /*
+  signMessage(channels[chanID].state, function(state, signature){
+      channels[chanID].signatures.push(signature)
+      publishMessage(state, channels[chanID].signatures)
+      console.log('challenge')
+      console.log(state)
+      console.log(channels)
+  })
+  */
+})
 
 setPlayer.addEventListener('click', function(event) {
   event.preventDefault()

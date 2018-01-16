@@ -59,25 +59,28 @@ func SignOffCommit(ctx context.Context, params op.SignOffCommitParams) middlewar
 	msg := params.Message
 	log.Printf("%s", *msg.Data)
 	log.Printf("%s", msg.Signatures)
-	data := common.FromHex(*msg.Data)
-	if len(msg.Signatures) != 2 { // TODO remove in favor of smart contract check
-		err_str := fmt.Sprintf("Signatures missing")
+	if len(msg.Signatures) == 0 {
+		err_str := fmt.Sprintf("No signature provided")
 		log.Printf(err_str)
 		return op.NewSignOffCommitDefault(500).WithPayload(&models.Error{Message: &err_str})
 	}
-	for i := range msg.Signatures {
-		sig := common.FromHex(msg.Signatures[i])
-		addr, err := ecRecover(ctx, data, sig)
-		if err != nil {
-			err_str := fmt.Sprintf("Failed to call %s: %v", "ecRecover", err)
-			log.Printf(err_str)
-			return op.NewSignOffCommitDefault(500).WithPayload(&models.Error{Message: &err_str})
-		}
-		ctct := getContextValue(ctx, contractKey).(*TicTacToe)
-		//TODO Timeout ?
-		opts := &bind.CallOpts{From: addr, Context: context.TODO()}
-		ret, err := ctct.GetPlayerMark(opts, addr)
-		log.Printf("Addr: %s [%v]", addr.String(), ret)
+	state := common.FromHex(*msg.Data)
+	v, r, s := extractSignature(msg.Signatures)
+	ctct := getContextValue(ctx, contractKey).(*TicTacToe)
+	//TODO Timeout ?
+	opts := &bind.CallOpts{Context: context.TODO()}
+	ret, err := ctct.Verify(opts, state, v[0], r[0], s[0])
+	log.Printf("CanChallenge: %v", ret)
+	if !ret {
+		err_str := fmt.Sprintf("State doesn't validate")
+		log.Printf(err_str)
+		return op.NewSignOffCommitDefault(500).WithPayload(&models.Error{Message: &err_str})
+	}
+	err = InsertState(ctx, &State{State: common.ToHex(state)}, msg.Signatures)
+	if err != nil {
+		err_str := fmt.Sprintf("Failed to call %s: %v", "InsertState", err)
+		log.Printf(err_str)
+		return op.NewSignOffCommitDefault(500).WithPayload(&models.Error{Message: &err_str})
 	}
 	return op.NewSignOffCommitOK()
 }
@@ -105,11 +108,11 @@ func CommitToChannel(ctx context.Context, params op.CommitToChannelParams) middl
 	v := uint8(sig[64])
 	copy(r[:], sig[0:32])
 	copy(s[:], sig[32:64])
-	log.Println(state)
 	opts := &bind.CallOpts{From: addr, Context: context.TODO()}
 	canApply, err := ctct.Verify(opts, state, v, r, s)
+	log.Printf("addr=%s, state=%+v, v=%+v, r=%+v, s=%+v\n", addr.String(), state, v, r, s)
 	if err != nil {
-		err_str := fmt.Sprintf("Failed to call %s: %v", "GetSignerGeth", err)
+		err_str := fmt.Sprintf("Failed to call %s: %v", "Verify", err)
 		log.Printf(err_str)
 		return op.NewCommitToChannelDefault(500).WithPayload(&models.Error{Message: &err_str})
 	}

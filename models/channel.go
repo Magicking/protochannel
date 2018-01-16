@@ -14,7 +14,6 @@ import (
 
 // Channel Channel information
 // swagger:model Channel
-
 type Channel struct {
 
 	// Channel Identifier
@@ -26,12 +25,6 @@ type Channel struct {
 	// Channel state
 	State string `json:"state,omitempty"`
 }
-
-/* polymorph Channel channel false */
-
-/* polymorph Channel signatures false */
-
-/* polymorph Channel state false */
 
 // Validate validates this channel
 func (m *Channel) Validate(formats strfmt.Registry) error {

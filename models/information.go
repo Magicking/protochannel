@@ -6,8 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"strconv"
-
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -16,64 +14,25 @@ import (
 
 // Information information
 // swagger:model Information
-
 type Information struct {
 
 	// Contract ABI JSON encoded
 	Abi string `json:"abi,omitempty"`
 
-	// List of in-memory channel
-	Channels []*Channel `json:"channels"`
+	// channels
+	Channels InformationChannels `json:"channels"`
 
 	// Channel address
 	ContractAddress string `json:"contract_address,omitempty"`
 }
 
-/* polymorph Information abi false */
-
-/* polymorph Information channels false */
-
-/* polymorph Information contract_address false */
-
 // Validate validates this information
 func (m *Information) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateChannels(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *Information) validateChannels(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Channels) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.Channels); i++ {
-
-		if swag.IsZero(m.Channels[i]) { // not required
-			continue
-		}
-
-		if m.Channels[i] != nil {
-
-			if err := m.Channels[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("channels" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
 	return nil
 }
 

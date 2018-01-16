@@ -16,7 +16,6 @@ import (
 // Message Message to send to channel
 //
 // swagger:model Message
-
 type Message struct {
 
 	// Hex encoded payload(TODO TDB) information
@@ -27,10 +26,6 @@ type Message struct {
 	// Required: true
 	Signatures []string `json:"signatures"`
 }
-
-/* polymorph Message data false */
-
-/* polymorph Message signatures false */
 
 // Validate validates this message
 func (m *Message) Validate(formats strfmt.Registry) error {

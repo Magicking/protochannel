@@ -39,11 +39,11 @@ type ctxValues struct {
 	m map[key]interface{}
 }
 
-func (v ctxValues) Set(k key, val interface{}) {
+func (v *ctxValues) Set(k key, val interface{}) {
 	v.m[k] = val
 }
 
-func (v ctxValues) Get(k key) interface{} {
+func (v *ctxValues) Get(k key) interface{} {
 	val, ok := v.m[k]
 	if !ok {
 		log.Fatalf("Could not find key: %v", k)

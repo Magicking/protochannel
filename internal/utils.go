@@ -73,3 +73,16 @@ func CreateAndSign(ctx context.Context) error {
 	}
 	return nil
 }
+
+func extractSignature(signatures []string) (v []uint8, r, s [][32]byte) {
+	v = make([]uint8, len(signatures))
+	r = make([][32]byte, len(signatures))
+	s = make([][32]byte, len(signatures))
+	for i, e := range signatures {
+		sig := common.FromHex(e)
+		v[i] = uint8(sig[64])
+		copy(r[i][:], sig[0:32])
+		copy(s[i][:], sig[32:64])
+	}
+	return v, r, s
+}
