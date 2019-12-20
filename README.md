@@ -1,6 +1,6 @@
 # Protochannel
 
-Protochannel is a toy project to demonstrate the usage of Ethereum state channel
+Protochannel is a prototype project to demonstrate the usage of Ethereum state channel
 to do off-chain transactions settleabe at any point in time forward manner.
 
 It's a work in progress TicTacToe implementation.
