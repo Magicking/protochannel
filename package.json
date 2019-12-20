@@ -13,7 +13,7 @@
   },
   "homepage": "https://github.com/Magicking/protochannel#readme",
   "dependencies": {
-    "angular": "^1.6.6",
+    "angular": "^1.7.9",
     "bn": "^1.0.1",
     "bootstrap": "^4.0.0-beta.2",
     "build-bundle": "^2.0.8",
