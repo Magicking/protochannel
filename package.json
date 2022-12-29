@@ -18,7 +18,7 @@
     "bootstrap": "^4.0.0-beta.2",
     "build-bundle": "^2.0.8",
     "eth-sig-util": "^1.2.0",
-    "ethereumjs-util": "^5.1.1",
+    "ethereumjs-util": "^5.2.1",
     "ethjs": "^0.3.0",
     "jquery": "^3.2.1",
     "popper.js": "^1.12.3"
